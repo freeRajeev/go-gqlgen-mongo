@@ -2,38 +2,38 @@
 #
 # https://gqlgen.com/getting-started/
 
-type JobListing {
+type CustomerProfile {
   _id: ID!
   title: String!
   description: String!
-  company: String!
-  url: String!
+  type: String!
+  email: String!
 }
 
 type Query {
-  jobs: [JobListing!]!
-  job(id: ID!): JobListing!
+  customers: [CustomerProfile!]!
+  customer(id: ID!): CustomerProfile!
 }
 
 type Mutation {
-  createJobListing(input: CreateJobListingInput!): JobListing!
-  updateJobListing(id: ID!, input: UpdateJobListingInput!): JobListing!
-  deleteJobListing(id: ID!): DeleteJobResponse!
+  createCustomerProfile(input: CreateCustomerProfileInput!): CustomerProfile!
+  updateCustomerProfile(id: ID!, input: UpdateCustomerProfileInput!): CustomerProfile!
+  deleteCustomerProfile(id: ID!): DeleteCustomerResponse!
 }
 
-input CreateJobListingInput {
+input CreateCustomerProfileInput {
   title: String!
   description: String!
-  company: String!
-  url: String!
+  type: String!
+  email: String!
 }
 
-input UpdateJobListingInput {
+input UpdateCustomerProfileInput {
   title: String
   description: String
-  url: String
+  eamil: String
 }
 
-type DeleteJobResponse {
-  deletedJobId: String!
+type DeleteCustomerResponse {
+  deletedCusId: String!
 }

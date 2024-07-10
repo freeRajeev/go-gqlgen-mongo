@@ -2,27 +2,33 @@
 
 package model
 
-type CreateJobListingInput struct {
+type CreateCustomerProfileInput struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
-	Company     string `json:"company"`
-	URL         string `json:"url"`
+	Type        string `json:"type"`
+	Email       string `json:"email"`
 }
 
-type DeleteJobResponse struct {
-	DeletedJobID string `json:"deletedJobId"`
-}
-
-type JobListing struct {
+type CustomerProfile struct {
 	ID          string `json:"_id"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
-	Company     string `json:"company"`
-	URL         string `json:"url"`
+	Type        string `json:"type"`
+	Email       string `json:"email"`
 }
 
-type UpdateJobListingInput struct {
-	Title       *string `json:"title"`
-	Description *string `json:"description"`
-	URL         *string `json:"url"`
+type DeleteCustomerResponse struct {
+	DeletedCusID string `json:"deletedCusId"`
+}
+
+type Mutation struct {
+}
+
+type Query struct {
+}
+
+type UpdateCustomerProfileInput struct {
+	Title       *string `json:"title,omitempty"`
+	Description *string `json:"description,omitempty"`
+	Eamil       *string `json:"eamil,omitempty"`
 }

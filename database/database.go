@@ -13,7 +13,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
-var connectionString string = "mongodb+srv://akhil:akhil@cluster0.td5oga4.mongodb.net/test"
+var connectionString string = "mongodb://localhost:27017/"
 
 type DB struct {
 	client *mongo.Client
@@ -40,55 +40,55 @@ func Connect() *DB {
 	}
 }
 
-func (db *DB) GetJob(id string) *model.JobListing {
-	jobCollec := db.client.Database("graphql-job-board").Collection("jobs")
+func (db *DB) GetProfile(id string) *model.CustomerProfile {
+	jobCollec := db.client.Database("graphql-customer-profile").Collection("customers")
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
 	_id, _ := primitive.ObjectIDFromHex(id)
 	filter := bson.M{"_id": _id}
-	var jobListing model.JobListing
-	err := jobCollec.FindOne(ctx, filter).Decode(&jobListing)
+	var customerProfile model.CustomerProfile
+	err := jobCollec.FindOne(ctx, filter).Decode(&customerProfile)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return &jobListing
+	return &customerProfile
 }
 
-func (db *DB) GetJobs() []*model.JobListing {
-	jobCollec := db.client.Database("graphql-job-board").Collection("jobs")
+func (db *DB) GetProfiles() []*model.CustomerProfile {
+	jobCollec := db.client.Database("graphql-customer-profile").Collection("customers")
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	var jobListings []*model.JobListing
+	var customerProfiles []*model.CustomerProfile
 	cursor, err := jobCollec.Find(ctx, bson.D{})
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if err = cursor.All(context.TODO(), &jobListings); err != nil {
+	if err = cursor.All(context.TODO(), &customerProfiles); err != nil {
 		panic(err)
 	}
 
-	return jobListings
+	return customerProfiles
 }
 
-func (db *DB) CreateJobListing(jobInfo model.CreateJobListingInput) *model.JobListing {
-	jobCollec := db.client.Database("graphql-job-board").Collection("jobs")
+func (db *DB) CreateCustomerProfile(profileInfo model.CreateCustomerProfileInput) *model.CustomerProfile {
+	jobCollec := db.client.Database("graphql-customer-profile").Collection("customers")
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	inserg, err := jobCollec.InsertOne(ctx, bson.M{"title": jobInfo.Title, "description": jobInfo.Description, "url": jobInfo.URL, "company": jobInfo.Company})
+	inserg, err := jobCollec.InsertOne(ctx, bson.M{"title": profileInfo.Title, "description": profileInfo.Description, "email": profileInfo.Email, "type": profileInfo.Type})
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	insertedID := inserg.InsertedID.(primitive.ObjectID).Hex()
-	returnJobListing := model.JobListing{ID: insertedID, Title: jobInfo.Title, Company: jobInfo.Company, Description: jobInfo.Description, URL: jobInfo.URL}
+	returnJobListing := model.CustomerProfile{ID: insertedID, Title: profileInfo.Title, Type: profileInfo.Type, Description: profileInfo.Description, Email: profileInfo.Email}
 	return &returnJobListing
 }
 
-func (db *DB) UpdateJobListing(jobId string, jobInfo model.UpdateJobListingInput) *model.JobListing {
-	jobCollec := db.client.Database("graphql-job-board").Collection("jobs")
+func (db *DB) UpdateCustomerProfile(jobId string, jobInfo model.UpdateCustomerProfileInput) *model.CustomerProfile {
+	jobCollec := db.client.Database("graphql-customer-profile").Collection("customers")
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
@@ -100,8 +100,8 @@ func (db *DB) UpdateJobListing(jobId string, jobInfo model.UpdateJobListingInput
 	if jobInfo.Description != nil {
 		updateJobInfo["description"] = jobInfo.Description
 	}
-	if jobInfo.URL != nil {
-		updateJobInfo["url"] = jobInfo.URL
+	if jobInfo.Eamil != nil {
+		updateJobInfo["email"] = jobInfo.Eamil
 	}
 
 	_id, _ := primitive.ObjectIDFromHex(jobId)
@@ -110,25 +110,25 @@ func (db *DB) UpdateJobListing(jobId string, jobInfo model.UpdateJobListingInput
 
 	results := jobCollec.FindOneAndUpdate(ctx, filter, update, options.FindOneAndUpdate().SetReturnDocument(1))
 
-	var jobListing model.JobListing
+	var customerProfile model.CustomerProfile
 
-	if err := results.Decode(&jobListing); err != nil {
+	if err := results.Decode(&customerProfile); err != nil {
 		log.Fatal(err)
 	}
 
-	return &jobListing
+	return &customerProfile
 }
 
-func (db *DB) DeleteJobListing(jobId string) *model.DeleteJobResponse {
-	jobCollec := db.client.Database("graphql-job-board").Collection("jobs")
+func (db *DB) DeleteCustomerProfile(customerId string) *model.DeleteCustomerResponse {
+	jobCollec := db.client.Database("graphql-customer-profile").Collection("customers")
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	_id, _ := primitive.ObjectIDFromHex(jobId)
+	_id, _ := primitive.ObjectIDFromHex(customerId)
 	filter := bson.M{"_id": _id}
 	_, err := jobCollec.DeleteOne(ctx, filter)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return &model.DeleteJobResponse{DeletedJobID: jobId}
+	return &model.DeleteCustomerResponse{DeletedCusID: customerId}
 }
